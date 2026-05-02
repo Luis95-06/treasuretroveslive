@@ -2,10 +2,15 @@ import { PrismaClient } from "@prisma/client";
 import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
 import path from "path";
 
-const DB_URL = `file:${path.resolve(process.cwd(), "dev.db")}`;
+function getDbUrl() {
+  if (process.env.VERCEL || process.env.NODE_ENV === "production") {
+    return "file:/tmp/dev.db";
+  }
+  return `file:${path.resolve(process.cwd(), "dev.db")}`;
+}
 
 function createPrismaClient() {
-  const adapter = new PrismaBetterSqlite3({ url: DB_URL });
+  const adapter = new PrismaBetterSqlite3({ url: getDbUrl() });
   return new PrismaClient({ adapter } as any);
 }
 
